@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('mazer/dist/assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('mazer/dist/assets/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('mazer/dist/assets/compiled/css/iconly.css') }}">
+    @stack('styles')
 </head>
 
 <body>
@@ -56,68 +57,92 @@
         </div>
     </div>
     <div class="sidebar-menu">
-        
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <ul class="menu">
+            <li class="sidebar-title">Menu</li>
 
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 250px; height: 100vh;">
-  <span class="fs-5 fw-semibold mb-3">Menu</span>
-  <ul class="nav nav-pills flex-column mb-auto">
-    <li class="nav-item">
-      <a href="#" class="nav-link active d-flex align-items-center">
-        <i class="bi bi-grid me-2"></i> Dashboard
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-check-circle me-2"></i> Tasks
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-people me-2"></i> Employees
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-briefcase me-2"></i> Departments
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-tags me-2"></i> Roles
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-calendar-check me-2"></i> Presences
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-currency-dollar me-2"></i> Payrolls
-      </a>
-    </li>
-    <li>
-      <a href="#" class="nav-link text-dark d-flex align-items-center">
-        <i class="bi bi-box-arrow-up me-2"></i> Leave Requests
-      </a>
-    </li>
-  </ul>
-  <hr>
-  <a href="#" class="nav-link text-danger d-flex align-items-center">
-    <i class="bi bi-box-arrow-right me-2"></i> Logout
-  </a>
-</div>
+            <li class="sidebar-item active">
+                <a href="{{ route('dashboard') }}" class='sidebar-link'>
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
 
+            <li class="sidebar-item">
+                <a href="{{ route('tasks.index') }}" class='sidebar-link'>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Tasks</span>
+                </a>
+            </li>
 
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-people-fill"></i>
+                    <span>Employees</span>
+                </a>
+            </li>
 
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-briefcase-fill"></i>
+                    <span>Departments</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-tags-fill"></i>
+                    <span>Roles</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>Presences</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-currency-dollar"></i>
+                    <span>Payrolls</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a href="#" class='sidebar-link'>
+                    <i class="bi bi-box-arrow-up"></i>
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <a href="{{ route('logout') }}" class='sidebar-link'
+                       onclick="event.preventDefault(); this.closest('form').submit();">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </a>
+                </form>
+            </li>
+        </ul>
     </div>
 </div>
         </div>
         <div id="main">
-            
-            @yield('content')
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <h3>@yield('title', 'Dashboard')</h3>
+            </div>
+            <div class="page-content">
+                @yield('content')
+            </div>
 
             <footer>
     <div class="footer clearfix mb-0 text-muted">
@@ -134,16 +159,9 @@
     </div>
     <script src="{{ asset('mazer/dist/assets/static/js/components/dark.js') }}"></script>
     <script src="{{ asset('mazer/dist/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
-    
-    
     <script src="{{ asset('mazer/dist/assets/compiled/js/app.js') }}"></script>
-    
 
-    
-<!-- Need: Apexcharts -->
-<script src="{{ asset('mazer/dist/assets/extensions/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ asset('mazer/dist/assets/static/js/pages/dashboard.js') }}"></script>
-
+    @stack('scripts')
 </body>
 
 </html>
