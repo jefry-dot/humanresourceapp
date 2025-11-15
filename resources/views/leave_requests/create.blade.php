@@ -43,20 +43,30 @@
                     @csrf
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="employee_id" class="form-label">Employee <span class="text-danger">*</span></label>
-                            <select class="form-select @error('employee_id') is-invalid @enderror" id="employee_id" name="employee_id" required>
-                                <option value="">Select Employee</option>
-                                @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
-                                    {{ $employee->fullname }}
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('employee_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        @if($currentEmployee)
+                            {{-- Employee: Show readonly name --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="employee_name" class="form-label">Employee</label>
+                                <input type="text" class="form-control" id="employee_name" value="{{ $currentEmployee->fullname }}" readonly>
+                                <input type="hidden" name="employee_id" value="{{ $currentEmployee->id }}">
+                            </div>
+                        @else
+                            {{-- Admin/HR: Show dropdown --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="employee_id" class="form-label">Employee <span class="text-danger">*</span></label>
+                                <select class="form-select @error('employee_id') is-invalid @enderror" id="employee_id" name="employee_id" required>
+                                    <option value="">Select Employee</option>
+                                    @foreach($employees as $employee)
+                                    <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                        {{ $employee->fullname }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('employee_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endif
 
                         <div class="col-md-6 mb-3">
                             <label for="leave_type" class="form-label">Leave Type <span class="text-danger">*</span></label>

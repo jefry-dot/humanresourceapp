@@ -39,13 +39,30 @@ class LeaveRequestController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
         $employees = Employee::where('status', 'active')->get();
 
-        return view('leave_requests.create', compact('employees'));
+        // Get current employee if not admin/hr
+        $currentEmployee = null;
+        if (!in_array($user->role, ['admin', 'hr'])) {
+            $currentEmployee = Employee::where('email', $user->email)->first();
+        }
+
+        return view('leave_requests.create', compact('employees', 'currentEmployee'));
     }
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        // If employee, auto-fill employee_id
+        if (!in_array($user->role, ['admin', 'hr'])) {
+            $employee = Employee::where('email', $user->email)->first();
+            if ($employee) {
+                $request->merge(['employee_id' => $employee->id]);
+            }
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'leave_type' => 'required|in:annual,sick,personal,maternity,paternity,unpaid',
@@ -56,7 +73,7 @@ class LeaveRequestController extends Controller
 
         LeaveRequest::create($validated);
 
-        return redirect()->route('leave-requests.index')->with('success', 'Leave request created successfully!');
+        return redirect()->route('leave-requests.index')->with('success', 'Leave request submitted successfully!');
     }
 
     public function edit(LeaveRequest $leaveRequest)
@@ -99,5 +116,57 @@ class LeaveRequestController extends Controller
         $leaveRequest->delete();
 
         return redirect()->route('leave-requests.index')->with('success', 'Leave request deleted successfully!');
+    }
+
+    public function approve(LeaveRequest $leaveRequest)
+    {
+        // Only allow if still pending
+        if ($leaveRequest->status !== 'pending') {
+            return redirect()->route('leave-requests.index')->with('error', 'Only pending requests can be approved!');
+        }
+
+        $leaveRequest->update([
+            'status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        return redirect()->route('leave-requests.index')->with('success', 'Leave request approved successfully!');
+    }
+
+    public function reject(LeaveRequest $leaveRequest)
+    {
+        // Only allow if still pending
+        if ($leaveRequest->status !== 'pending') {
+            return redirect()->route('leave-requests.index')->with('error', 'Only pending requests can be rejected!');
+        }
+
+        $leaveRequest->update([
+            'status' => 'rejected',
+            'approved_by' => null,
+            'approved_at' => null,
+        ]);
+
+        return redirect()->route('leave-requests.index')->with('success', 'Leave request rejected!');
+    }
+
+    public function cancel(LeaveRequest $leaveRequest)
+    {
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+
+        // Check if this is employee's own request
+        if (!$employee || $leaveRequest->employee_id !== $employee->id) {
+            return redirect()->route('leave-requests.index')->with('error', 'You can only cancel your own leave requests!');
+        }
+
+        // Only allow cancel if still pending
+        if ($leaveRequest->status !== 'pending') {
+            return redirect()->route('leave-requests.index')->with('error', 'Only pending requests can be cancelled!');
+        }
+
+        $leaveRequest->delete();
+
+        return redirect()->route('leave-requests.index')->with('success', 'Leave request cancelled successfully!');
     }
 }

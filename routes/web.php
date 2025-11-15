@@ -75,6 +75,8 @@ Route::middleware(['auth', 'role:admin,hr'])->group(function () {
     Route::get('/leave-requests/{leaveRequest}/edit', [LeaveRequestController::class, 'edit'])->name('leave-requests.edit');
     Route::put('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update'])->name('leave-requests.update');
     Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy'])->name('leave-requests.destroy');
+    Route::post('/leave-requests/{leaveRequest}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::post('/leave-requests/{leaveRequest}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
 
     // Presences - HR can manage all
     Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
@@ -112,6 +114,7 @@ Route::middleware(['auth', 'role:admin,hr,manager,employee'])->group(function ()
     Route::get('/leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
     Route::get('/leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
     Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::delete('/leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
 
     // Presences - Employee can view own and check-in/check-out
     Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');

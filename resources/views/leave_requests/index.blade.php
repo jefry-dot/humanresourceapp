@@ -104,18 +104,45 @@
                                 @endif
                             </td>
                             <td>
-                                {{-- Only Admin and HR can Edit/Delete leave requests --}}
+                                {{-- Admin/HR: Approve/Reject/Edit/Delete --}}
                                 @if(in_array(auth()->user()->role, ['admin', 'hr']))
                                 <div class="btn-group" role="group">
+                                    @if($request->status === 'pending')
+                                        {{-- Approve Button --}}
+                                        <form action="{{ route('leave-requests.approve', $request->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success" title="Approve" onclick="return confirm('Approve this leave request?')">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+                                        {{-- Reject Button --}}
+                                        <form action="{{ route('leave-requests.reject', $request->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Reject" onclick="return confirm('Reject this leave request?')">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    {{-- Edit Button (always show for admin/hr) --}}
                                     <a href="{{ route('leave-requests.edit', $request->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    {{-- Delete Button --}}
                                     <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteLeaveRequest({{ $request->id }}, '{{ $request->employee->fullname }} - {{ $request->leave_type }}')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
+                                {{-- Employee: Can only cancel if pending --}}
+                                @elseif($request->status === 'pending')
+                                <form action="{{ route('leave-requests.cancel', $request->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-warning" title="Cancel Request" onclick="return confirm('Cancel this leave request?')">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </button>
+                                </form>
                                 @else
-                                <span class="badge bg-secondary">View Only</span>
+                                <span class="badge bg-secondary">-</span>
                                 @endif
                             </td>
                         </tr>
