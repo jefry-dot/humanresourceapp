@@ -88,13 +88,13 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-info" title="View">
+                                    <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm btn-info" title="View">
                                         <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-primary" title="Edit">
+                                    </a>
+                                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Delete">
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteEmployee({{ $employee->id }}, '{{ $employee->fullname }}')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -229,6 +229,31 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Employee Modal -->
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteEmployeeModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this employee?</p>
+                <p class="fw-bold" id="deleteEmployeeName"></p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteEmployeeForm" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -241,5 +266,18 @@
         var createEmployeeModal = new bootstrap.Modal(document.getElementById('createEmployeeModal'));
         createEmployeeModal.show();
     @endif
+
+    // Function to delete employee
+    function deleteEmployee(employeeId, employeeName) {
+        // Set employee name in modal
+        document.getElementById('deleteEmployeeName').textContent = employeeName;
+
+        // Set form action
+        document.getElementById('deleteEmployeeForm').action = `/employees/${employeeId}`;
+
+        // Show modal
+        var deleteEmployeeModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+        deleteEmployeeModal.show();
+    }
 </script>
 @endpush
