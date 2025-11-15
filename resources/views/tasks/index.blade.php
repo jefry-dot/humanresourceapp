@@ -82,7 +82,7 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-info" title="View">
+                                    <button type="button" class="btn btn-sm btn-info" title="View" onclick="viewTask({{ $task->id }})">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                     @if($task->status != 'completed')
@@ -119,6 +119,61 @@
             </div>
         </div>
     </section>
+</div>
+
+<!-- View Task Modal -->
+<div class="modal fade" id="viewTaskModal" tabindex="-1" aria-labelledby="viewTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="viewTaskModalLabel">Task Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Title</label>
+                    <p id="view_title" class="form-control-plaintext">-</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Description</label>
+                    <p id="view_description" class="form-control-plaintext" style="white-space: pre-wrap;">-</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Assigned To</label>
+                        <p id="view_assigned_to" class="form-control-plaintext">-</p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Due Date</label>
+                        <p id="view_due_date" class="form-control-plaintext">-</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Status</label>
+                    <p id="view_status" class="form-control-plaintext"></p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Created At</label>
+                        <p id="view_created_at" class="form-control-plaintext text-muted small">-</p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold text-muted">Updated At</label>
+                        <p id="view_updated_at" class="form-control-plaintext text-muted small">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Create Task Modal -->
@@ -328,6 +383,47 @@
         // Show modal
         var deleteTaskModal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
         deleteTaskModal.show();
+    }
+
+    // Function to view task details
+    function viewTask(taskId) {
+        // Fetch task data
+        fetch(`/tasks/${taskId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(task => {
+            // Populate task details
+            document.getElementById('view_title').textContent = task.title || '-';
+            document.getElementById('view_description').textContent = task.description || '-';
+            document.getElementById('view_assigned_to').textContent = task.assigned_to || '-';
+            document.getElementById('view_due_date').textContent = task.due_date || '-';
+            document.getElementById('view_created_at').textContent = task.created_at || '-';
+            document.getElementById('view_updated_at').textContent = task.updated_at || '-';
+
+            // Set status badge
+            let statusHtml = '';
+            if (task.status === 'completed') {
+                statusHtml = '<span class="badge bg-success">Completed</span>';
+            } else if (task.status === 'in_progress') {
+                statusHtml = '<span class="badge bg-warning">In Progress</span>';
+            } else {
+                statusHtml = '<span class="badge bg-secondary">Pending</span>';
+            }
+            document.getElementById('view_status').innerHTML = statusHtml;
+
+            // Show modal
+            var viewTaskModal = new bootstrap.Modal(document.getElementById('viewTaskModal'));
+            viewTaskModal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching task:', error);
+            alert('Failed to load task details');
+        });
     }
 
     // Function to update task status

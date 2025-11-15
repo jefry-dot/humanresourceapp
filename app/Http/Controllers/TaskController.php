@@ -28,6 +28,23 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task created successfully!');
     }
 
+    public function show(Task $task)
+    {
+        // Format the task data for display
+        $taskData = [
+            'id' => $task->id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'assigned_to' => $task->assigned_to,
+            'due_date' => $task->due_date ? $task->due_date->format('d M Y') : null,
+            'status' => $task->status,
+            'created_at' => $task->created_at->format('d M Y H:i'),
+            'updated_at' => $task->updated_at->format('d M Y H:i'),
+        ];
+
+        return response()->json($taskData);
+    }
+
     public function edit(Task $task)
     {
         // Format the task data for the form
