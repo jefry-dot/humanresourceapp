@@ -22,6 +22,7 @@ Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->n
 Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
 Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
 
 
 
