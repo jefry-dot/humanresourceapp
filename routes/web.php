@@ -31,6 +31,8 @@ Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->
 
 Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
 Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
+Route::get('/departments/{department}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
+Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

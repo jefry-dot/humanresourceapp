@@ -80,9 +80,9 @@
                             <td>{{ $department->created_at->format('d M Y') }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-primary" title="Edit">
+                                    <a href="{{ route('departments.edit', $department->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
+                                    </a>
                                     <button type="button" class="btn btn-sm btn-danger" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </button>
