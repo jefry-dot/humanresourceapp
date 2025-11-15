@@ -100,7 +100,7 @@
                                         <i class="bi bi-clock"></i>
                                     </button>
                                     @endif
-                                    <button type="button" class="btn btn-sm btn-primary" title="Edit">
+                                    <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editTask({{ $task->id }})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger" title="Delete">
@@ -176,6 +176,51 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTaskForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_title" class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="edit_title" name="title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_assigned_to" class="form-label">Assigned To</label>
+                        <input type="text" class="form-control" id="edit_assigned_to" name="assigned_to">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_due_date" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="edit_due_date" name="due_date">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_status" class="form-label">Status <span class="text-danger">*</span></label>
+                        <select class="form-select" id="edit_status" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -188,5 +233,46 @@
         var createTaskModal = new bootstrap.Modal(document.getElementById('createTaskModal'));
         createTaskModal.show();
     @endif
+
+    // Function to edit task
+    function editTask(taskId) {
+        // Fetch task data
+        fetch(`/tasks/${taskId}/edit`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(task => {
+            // Populate form fields
+            document.getElementById('edit_title').value = task.title || '';
+            document.getElementById('edit_assigned_to').value = task.assigned_to || '';
+
+            // Format due_date for input[type="date"] (YYYY-MM-DD)
+            if (task.due_date) {
+                // If due_date is already in YYYY-MM-DD format, use it directly
+                // Otherwise, convert it
+                let dateValue = task.due_date.split('T')[0]; // Handle ISO format
+                document.getElementById('edit_due_date').value = dateValue;
+            } else {
+                document.getElementById('edit_due_date').value = '';
+            }
+
+            document.getElementById('edit_status').value = task.status || 'pending';
+
+            // Update form action
+            document.getElementById('editTaskForm').action = `/tasks/${taskId}`;
+
+            // Show modal
+            var editTaskModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+            editTaskModal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching task:', error);
+            alert('Failed to load task data');
+        });
+    }
 </script>
 @endpush
