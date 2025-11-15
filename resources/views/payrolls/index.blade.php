@@ -79,6 +79,9 @@
                             <td class="fw-bold text-primary">Rp {{ number_format($payroll->net_salary, 0, ',', '.') }}</td>
                             <td>
                                 <div class="btn-group" role="group">
+                                    <a href="{{ route('payrolls.show', $payroll->id) }}" class="btn btn-sm btn-info" title="View Slip">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </a>
                                     <a href="{{ route('payrolls.edit', $payroll->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>

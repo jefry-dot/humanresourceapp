@@ -24,6 +24,13 @@ class PayrollController extends Controller
         return view('payrolls.create', compact('employees'));
     }
 
+    public function show(Payroll $payroll)
+    {
+        $payroll->load(['employee.department', 'employee.role']);
+
+        return view('payrolls.show', compact('payroll'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
