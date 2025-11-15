@@ -33,6 +33,7 @@ Route::get('/departments', [DepartmentController::class, 'index'])->name('depart
 Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
 Route::get('/departments/{department}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
 Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
+Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -83,7 +83,7 @@
                                     <a href="{{ route('departments.edit', $department->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Delete">
+                                    <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteDepartment({{ $department->id }}, '{{ $department->name }}')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -147,6 +147,31 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Department Modal -->
+<div class="modal fade" id="deleteDepartmentModal" tabindex="-1" aria-labelledby="deleteDepartmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteDepartmentModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this department?</p>
+                <p class="fw-bold" id="deleteDepartmentName"></p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteDepartmentForm" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -159,5 +184,18 @@
         var createDepartmentModal = new bootstrap.Modal(document.getElementById('createDepartmentModal'));
         createDepartmentModal.show();
     @endif
+
+    // Function to delete department
+    function deleteDepartment(departmentId, departmentName) {
+        // Set department name in modal
+        document.getElementById('deleteDepartmentName').textContent = departmentName;
+
+        // Set form action
+        document.getElementById('deleteDepartmentForm').action = `/departments/${departmentId}`;
+
+        // Show modal
+        var deleteDepartmentModal = new bootstrap.Modal(document.getElementById('deleteDepartmentModal'));
+        deleteDepartmentModal.show();
+    }
 </script>
 @endpush
