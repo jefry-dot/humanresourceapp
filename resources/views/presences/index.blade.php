@@ -50,9 +50,12 @@
                 <h5 class="card-title mb-0">
                     All Presences
                 </h5>
+                {{-- Only Admin and HR can create presences --}}
+                @if(in_array(auth()->user()->role, ['admin', 'hr']))
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPresenceModal">
                     <i class="bi bi-plus-circle"></i> New Presence
                 </button>
+                @endif
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="table1">
@@ -85,6 +88,8 @@
                                 @endif
                             </td>
                             <td>
+                                {{-- Only Admin and HR can Edit/Delete presences --}}
+                                @if(in_array(auth()->user()->role, ['admin', 'hr']))
                                 <div class="btn-group" role="group">
                                     <a href="{{ route('presences.edit', $presence->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
@@ -93,6 +98,9 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
+                                @else
+                                <span class="badge bg-secondary">View Only</span>
+                                @endif
                             </td>
                         </tr>
                         @empty

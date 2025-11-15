@@ -60,61 +60,83 @@
         <ul class="menu">
             <li class="sidebar-title">Menu</li>
 
-            <li class="sidebar-item active">
+            {{-- Dashboard - All Users --}}
+            <li class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <a href="{{ route('dashboard') }}" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
 
-            <li class="sidebar-item">
+            {{-- Tasks - Manager & Employee --}}
+            @if(in_array(auth()->user()->role, ['admin', 'hr', 'manager', 'employee']))
+            <li class="sidebar-item {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
                 <a href="{{ route('tasks.index') }}" class='sidebar-link'>
                     <i class="bi bi-check-circle-fill"></i>
                     <span>Tasks</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Employees - Admin & HR Only --}}
+            @if(in_array(auth()->user()->role, ['admin', 'hr']))
+            <li class="sidebar-item {{ request()->routeIs('employees.*') ? 'active' : '' }}">
                 <a href="{{ route('employees.index') }}" class='sidebar-link'>
                     <i class="bi bi-people-fill"></i>
                     <span>Employees</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Departments - Admin Only --}}
+            @if(auth()->user()->role === 'admin')
+            <li class="sidebar-item {{ request()->routeIs('departments.*') ? 'active' : '' }}">
                 <a href="{{ route('departments.index') }}" class='sidebar-link'>
                     <i class="bi bi-briefcase-fill"></i>
                     <span>Departments</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Roles - Admin Only --}}
+            @if(auth()->user()->role === 'admin')
+            <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
                 <a href="{{ route('roles.index') }}" class='sidebar-link'>
                     <i class="bi bi-tags-fill"></i>
                     <span>Roles</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Presences - HR, Manager, Employee --}}
+            @if(in_array(auth()->user()->role, ['admin', 'hr', 'manager', 'employee']))
+            <li class="sidebar-item {{ request()->routeIs('presences.*') ? 'active' : '' }}">
                 <a href="{{ route('presences.index') }}" class='sidebar-link'>
                     <i class="bi bi-calendar-check-fill"></i>
                     <span>Presences</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Payrolls - Admin & HR Only --}}
+            @if(in_array(auth()->user()->role, ['admin', 'hr']))
+            <li class="sidebar-item {{ request()->routeIs('payrolls.*') ? 'active' : '' }}">
                 <a href="{{ route('payrolls.index') }}" class='sidebar-link'>
                     <i class="bi bi-currency-dollar"></i>
                     <span>Payrolls</span>
                 </a>
             </li>
+            @endif
 
-            <li class="sidebar-item">
+            {{-- Leave Requests - HR & Employee --}}
+            @if(in_array(auth()->user()->role, ['admin', 'hr', 'employee']))
+            <li class="sidebar-item {{ request()->routeIs('leave-requests.*') ? 'active' : '' }}">
                 <a href="{{ route('leave-requests.index') }}" class='sidebar-link'>
                     <i class="bi bi-box-arrow-up"></i>
                     <span>Leave Requests</span>
                 </a>
             </li>
+            @endif
 
             <li class="sidebar-item">
                 <form method="POST" action="{{ route('logout') }}">

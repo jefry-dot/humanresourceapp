@@ -50,9 +50,12 @@
                 <h5 class="card-title mb-0">
                     All Employees
                 </h5>
+                {{-- Only Admin and HR can create employees --}}
+                @if(in_array(auth()->user()->role, ['admin', 'hr']))
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">
                     <i class="bi bi-plus-circle"></i> New Employee
                 </button>
+                @endif
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="table1">
@@ -91,12 +94,15 @@
                                     <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm btn-info" title="View">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {{-- Only Admin and HR can Edit/Delete employees --}}
+                                    @if(in_array(auth()->user()->role, ['admin', 'hr']))
                                     <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteEmployee({{ $employee->id }}, '{{ $employee->fullname }}')">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

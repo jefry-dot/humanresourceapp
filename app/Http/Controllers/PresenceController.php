@@ -10,10 +10,48 @@ class PresenceController extends Controller
 {
     public function index()
     {
-        $presences = Presence::with('employee')
-            ->orderBy('date', 'desc')
-            ->orderBy('check_in', 'desc')
-            ->get();
+        $user = auth()->user();
+
+        // Admin & HR: See all presences
+        if (in_array($user->role, ['admin', 'hr'])) {
+            $presences = Presence::with('employee')
+                ->orderBy('date', 'desc')
+                ->orderBy('check_in', 'desc')
+                ->get();
+        }
+        // Manager: See team presences only (employees in their department)
+        elseif ($user->role === 'manager') {
+            // Find manager's employee record
+            $manager = Employee::where('email', $user->email)->first();
+
+            if ($manager) {
+                // Get all employees in the same department
+                $teamEmployeeIds = Employee::where('department_id', $manager->department_id)
+                    ->pluck('id');
+
+                $presences = Presence::with('employee')
+                    ->whereIn('employee_id', $teamEmployeeIds)
+                    ->orderBy('date', 'desc')
+                    ->orderBy('check_in', 'desc')
+                    ->get();
+            } else {
+                $presences = collect();
+            }
+        }
+        // Employee: Only see own presences
+        else {
+            $employee = Employee::where('email', $user->email)->first();
+
+            if ($employee) {
+                $presences = Presence::with('employee')
+                    ->where('employee_id', $employee->id)
+                    ->orderBy('date', 'desc')
+                    ->orderBy('check_in', 'desc')
+                    ->get();
+            } else {
+                $presences = collect();
+            }
+        }
 
         $employees = Employee::where('status', 'active')->get();
 

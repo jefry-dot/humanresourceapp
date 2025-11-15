@@ -50,9 +50,12 @@
                 <h5 class="card-title mb-0">
                     All Leave Requests
                 </h5>
+                {{-- Only Admin, HR, and Employee can create leave requests --}}
+                @if(in_array(auth()->user()->role, ['admin', 'hr', 'employee']))
                 <a href="{{ route('leave-requests.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> New Leave Request
                 </a>
+                @endif
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="table1">
@@ -101,6 +104,8 @@
                                 @endif
                             </td>
                             <td>
+                                {{-- Only Admin and HR can Edit/Delete leave requests --}}
+                                @if(in_array(auth()->user()->role, ['admin', 'hr']))
                                 <div class="btn-group" role="group">
                                     <a href="{{ route('leave-requests.edit', $request->id) }}" class="btn btn-sm btn-primary" title="Edit">
                                         <i class="bi bi-pencil"></i>
@@ -109,6 +114,9 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
+                                @else
+                                <span class="badge bg-secondary">View Only</span>
+                                @endif
                             </td>
                         </tr>
                         @empty

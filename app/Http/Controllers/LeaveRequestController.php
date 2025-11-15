@@ -10,9 +10,28 @@ class LeaveRequestController extends Controller
 {
     public function index()
     {
-        $leaveRequests = LeaveRequest::with(['employee', 'approver'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $user = auth()->user();
+
+        // Admin & HR: See all leave requests
+        if (in_array($user->role, ['admin', 'hr'])) {
+            $leaveRequests = LeaveRequest::with(['employee', 'approver'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        // Employee: Only see own leave requests
+        else {
+            // Find employee record by user email or employee_id
+            $employee = Employee::where('email', $user->email)->first();
+
+            if ($employee) {
+                $leaveRequests = LeaveRequest::with(['employee', 'approver'])
+                    ->where('employee_id', $employee->id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            } else {
+                $leaveRequests = collect(); // Empty collection if no employee found
+            }
+        }
 
         return view('leave_requests.index', compact('leaveRequests'));
     }

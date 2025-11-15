@@ -50,9 +50,12 @@
                 <h5 class="card-title mb-0">
                     All Tasks
                 </h5>
+                {{-- Only Admin, HR, and Manager can create tasks --}}
+                @if(in_array(auth()->user()->role, ['admin', 'hr', 'manager']))
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
                     <i class="bi bi-plus-circle"></i> New Task
                 </button>
+                @endif
             </div>
             <div class="card-body">
                 <table class="table table-striped" id="table1">
@@ -100,12 +103,15 @@
                                         <i class="bi bi-clock"></i>
                                     </button>
                                     @endif
+                                    {{-- Only Admin, HR, and Manager can Edit/Delete tasks --}}
+                                    @if(in_array(auth()->user()->role, ['admin', 'hr', 'manager']))
                                     <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editTask({{ $task->id }})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteTask({{ $task->id }})">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
