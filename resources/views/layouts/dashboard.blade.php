@@ -110,7 +110,7 @@
             </li>
 
             <li class="sidebar-item">
-                <a href="#" class='sidebar-link'>
+                <a href="{{ route('leave-requests.index') }}" class='sidebar-link'>
                     <i class="bi bi-box-arrow-up"></i>
                     <span>Leave Requests</span>
                 </a>
@@ -137,12 +137,7 @@
                 </a>
             </header>
 
-            <div class="page-heading">
-                <h3>@yield('title', 'Dashboard')</h3>
-            </div>
-            <div class="page-content">
-                @yield('content')
-            </div>
+            @yield('content')
 
             <footer>
     <div class="footer clearfix mb-0 text-muted">
