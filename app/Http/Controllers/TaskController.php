@@ -17,6 +17,7 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'assigned_to' => 'nullable|string|max:255',
             'due_date' => 'nullable|date',
             'status' => 'required|in:pending,in_progress,completed',
@@ -33,6 +34,7 @@ class TaskController extends Controller
         $taskData = [
             'id' => $task->id,
             'title' => $task->title,
+            'description' => $task->description,
             'assigned_to' => $task->assigned_to,
             'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
             'status' => $task->status,
@@ -45,6 +47,7 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'assigned_to' => 'nullable|string|max:255',
             'due_date' => 'nullable|date',
             'status' => 'required|in:pending,in_progress,completed',

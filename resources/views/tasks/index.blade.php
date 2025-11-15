@@ -141,6 +141,14 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                        @error('description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="assigned_to" class="form-label">Assigned To</label>
                         <input type="text" class="form-control @error('assigned_to') is-invalid @enderror" id="assigned_to" name="assigned_to" value="{{ old('assigned_to') }}">
                         @error('assigned_to')
@@ -192,6 +200,11 @@
                     <div class="mb-3">
                         <label for="edit_title" class="form-label">Title <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="edit_title" name="title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3"></textarea>
                     </div>
 
                     <div class="mb-3">
@@ -279,6 +292,7 @@
         .then(task => {
             // Populate form fields
             document.getElementById('edit_title').value = task.title || '';
+            document.getElementById('edit_description').value = task.description || '';
             document.getElementById('edit_assigned_to').value = task.assigned_to || '';
 
             // Format due_date for input[type="date"] (YYYY-MM-DD)
