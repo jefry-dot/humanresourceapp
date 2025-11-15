@@ -148,6 +148,14 @@
             </li>
             @endif
 
+            {{-- My Profile - All Users --}}
+            <li class="sidebar-item {{ request()->routeIs('employee-profile.*') ? 'active' : '' }}">
+                <a href="{{ route('employee-profile.index') }}" class='sidebar-link'>
+                    <i class="bi bi-person-circle"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+
             <li class="sidebar-item">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

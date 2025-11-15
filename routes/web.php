@@ -11,6 +11,7 @@ use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\EmployeeProfileController;
 
 
 Route::get('/', function () {
@@ -120,6 +121,10 @@ Route::middleware(['auth', 'role:admin,hr,manager,employee'])->group(function ()
     Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
     Route::post('/presences/check-in', [PresenceController::class, 'checkIn'])->name('presences.checkin');
     Route::post('/presences/check-out', [PresenceController::class, 'checkOut'])->name('presences.checkout');
+
+    // Employee Profile - All employees can view and update their own profile
+    Route::get('/my-profile', [EmployeeProfileController::class, 'index'])->name('employee-profile.index');
+    Route::put('/my-profile', [EmployeeProfileController::class, 'update'])->name('employee-profile.update');
 });
 
 Route::middleware('auth')->group(function () {
