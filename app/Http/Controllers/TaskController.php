@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\Employee;
 
 class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::orderBy('created_at', 'desc')->get();
-        return view('tasks.index', compact('tasks'));
+        $tasks = Task::with('employee')->orderBy('created_at', 'desc')->get();
+        $employees = Employee::where('status', 'active')->orderBy('fullname')->get();
+        return view('tasks.index', compact('tasks', 'employees'));
     }
 
     public function store(Request $request)
@@ -18,7 +20,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'assigned_to' => 'nullable|string|max:255',
+            'assigned_to' => 'nullable|exists:employees,id',
             'due_date' => 'nullable|date',
             'status' => 'required|in:pending,in_progress,completed',
         ]);
@@ -30,19 +32,10 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        // Format the task data for display
-        $taskData = [
-            'id' => $task->id,
-            'title' => $task->title,
-            'description' => $task->description,
-            'assigned_to' => $task->assigned_to,
-            'due_date' => $task->due_date ? $task->due_date->format('d M Y') : null,
-            'status' => $task->status,
-            'created_at' => $task->created_at->format('d M Y H:i'),
-            'updated_at' => $task->updated_at->format('d M Y H:i'),
-        ];
+        // Load employee relationship
+        $task->load('employee');
 
-        return response()->json($taskData);
+        return view('tasks.show', compact('task'));
     }
 
     public function edit(Task $task)
@@ -52,7 +45,7 @@ class TaskController extends Controller
             'id' => $task->id,
             'title' => $task->title,
             'description' => $task->description,
-            'assigned_to' => $task->assigned_to,
+            'assigned_to' => $task->assigned_to, // This is employee_id
             'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
             'status' => $task->status,
         ];
@@ -65,7 +58,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'assigned_to' => 'nullable|string|max:255',
+            'assigned_to' => 'nullable|exists:employees,id',
             'due_date' => 'nullable|date',
             'status' => 'required|in:pending,in_progress,completed',
         ]);

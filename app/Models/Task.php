@@ -17,4 +17,10 @@ class Task extends Model
     protected $casts = [
         'due_date' => 'date',
     ];
+
+    // Relationship to Employee
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'assigned_to');
+    }
 }

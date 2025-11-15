@@ -18,6 +18,7 @@ class DashboardController extends Controller
 
         // Get statistics based on role
         $stats = [];
+        $latestTasks = [];
 
         if (in_array($user->role, ['admin', 'hr'])) {
             // Admin & HR: Full statistics
@@ -36,6 +37,9 @@ class DashboardController extends Controller
                     ->whereDate('end_date', '>=', today())
                     ->count(),
             ];
+
+            // Get latest tasks for admin/hr
+            $latestTasks = Task::orderBy('created_at', 'desc')->take(5)->get();
         } elseif ($user->role === 'manager') {
             // Manager: Team statistics
             $manager = Employee::where('email', $user->email)->first();
@@ -56,6 +60,9 @@ class DashboardController extends Controller
                         ->whereDate('end_date', '>=', today())
                         ->count(),
                 ];
+
+                // Get latest tasks for manager
+                $latestTasks = Task::orderBy('created_at', 'desc')->take(5)->get();
             }
         } else {
             // Employee: Personal statistics
@@ -73,9 +80,15 @@ class DashboardController extends Controller
                         ->where('status', 'pending')
                         ->count(),
                 ];
+
+                // Get latest tasks for employee (assigned to them)
+                $latestTasks = Task::where('assigned_to', $employee->id)
+                    ->orderBy('created_at', 'desc')
+                    ->take(5)
+                    ->get();
             }
         }
 
-        return view('dashboard.index', compact('stats'));
+        return view('dashboard.index', compact('stats', 'latestTasks'));
     }
 }

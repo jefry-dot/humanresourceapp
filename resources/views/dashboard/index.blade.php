@@ -325,6 +325,74 @@
             @endif
         </div>
 
+        {{-- Latest Tasks Section --}}
+        @if(count($latestTasks) > 0)
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4><i class="bi bi-list-task"></i> Latest Tasks</h4>
+                        <a href="{{ route('tasks.index') }}" class="btn btn-sm btn-primary">
+                            View All <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($latestTasks as $task)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $task->title }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ Str::limit($task->description ?? '-', 50) }}
+                                        </td>
+                                        <td>
+                                            @if($task->due_date)
+                                                <span class="{{ $task->due_date->isPast() && $task->status !== 'completed' ? 'text-danger' : '' }}">
+                                                    {{ $task->due_date->format('d M Y') }}
+                                                </span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($task->status == 'pending')
+                                                <span class="badge bg-warning">Pending</span>
+                                            @elseif($task->status == 'in_progress')
+                                                <span class="badge bg-primary">In Progress</span>
+                                            @elseif($task->status == 'completed')
+                                                <span class="badge bg-success">Completed</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ ucfirst($task->status) }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('tasks.show', $task->id) }}" class="btn btn-sm btn-info" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Quick Actions Section --}}
         <div class="row mt-4">
             <div class="col-12">
