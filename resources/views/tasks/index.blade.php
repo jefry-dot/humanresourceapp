@@ -103,7 +103,7 @@
                                     <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editTask({{ $task->id }})">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger" title="Delete">
+                                    <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deleteTask({{ $task->id }})">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -221,6 +221,30 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteTaskModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteTaskForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this task?</p>
+                    <p class="text-muted mb-0">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -273,6 +297,16 @@
             console.error('Error fetching task:', error);
             alert('Failed to load task data');
         });
+    }
+
+    // Function to delete task
+    function deleteTask(taskId) {
+        // Update form action
+        document.getElementById('deleteTaskForm').action = `/tasks/${taskId}`;
+
+        // Show modal
+        var deleteTaskModal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+        deleteTaskModal.show();
     }
 </script>
 @endpush
