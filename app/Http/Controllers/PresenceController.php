@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Presence;
 use App\Models\Employee;
+use App\Models\CompanySetting;
+use Carbon\Carbon;
 
 class PresenceController extends Controller
 {
@@ -12,50 +14,41 @@ class PresenceController extends Controller
     {
         $user = auth()->user();
 
-        // Admin & HR: See all presences
+        // Admin & HR: Show management view
         if (in_array($user->role, ['admin', 'hr'])) {
             $presences = Presence::with('employee')
                 ->orderBy('date', 'desc')
                 ->orderBy('check_in', 'desc')
                 ->get();
-        }
-        // Manager: See team presences only (employees in their department)
-        elseif ($user->role === 'manager') {
-            // Find manager's employee record
-            $manager = Employee::where('email', $user->email)->first();
 
-            if ($manager) {
-                // Get all employees in the same department
-                $teamEmployeeIds = Employee::where('department_id', $manager->department_id)
-                    ->pluck('id');
+            $employees = Employee::where('status', 'active')->get();
 
-                $presences = Presence::with('employee')
-                    ->whereIn('employee_id', $teamEmployeeIds)
-                    ->orderBy('date', 'desc')
-                    ->orderBy('check_in', 'desc')
-                    ->get();
-            } else {
-                $presences = collect();
-            }
+            return view('presences.admin', compact('presences', 'employees'));
         }
-        // Employee: Only see own presences
+        // Manager & Employee: Show attendance view with GPS
         else {
             $employee = Employee::where('email', $user->email)->first();
 
-            if ($employee) {
-                $presences = Presence::with('employee')
-                    ->where('employee_id', $employee->id)
-                    ->orderBy('date', 'desc')
-                    ->orderBy('check_in', 'desc')
-                    ->get();
-            } else {
-                $presences = collect();
+            if (!$employee) {
+                return redirect()->route('dashboard')->with('error', 'Employee record not found!');
             }
+
+            // Get today's presence
+            $todayPresence = Presence::where('employee_id', $employee->id)
+                ->whereDate('date', today())
+                ->first();
+
+            // Get presence history
+            $presences = Presence::where('employee_id', $employee->id)
+                ->orderBy('date', 'desc')
+                ->orderBy('check_in', 'desc')
+                ->limit(10)
+                ->get();
+
+            $settings = CompanySetting::getSettings();
+
+            return view('presences.employee', compact('employee', 'todayPresence', 'presences', 'settings'));
         }
-
-        $employees = Employee::where('status', 'active')->get();
-
-        return view('presences.index', compact('presences', 'employees'));
     }
 
     public function store(Request $request)
@@ -112,5 +105,151 @@ class PresenceController extends Controller
         $presence->delete();
 
         return redirect()->route('presences.index')->with('success', 'Presence deleted successfully!');
+    }
+
+    public function checkIn(Request $request)
+    {
+        $validated = $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+
+        if (!$employee) {
+            return response()->json(['error' => 'Employee record not found!'], 404);
+        }
+
+        // Check if already checked in today
+        $existingPresence = Presence::where('employee_id', $employee->id)
+            ->whereDate('date', today())
+            ->first();
+
+        if ($existingPresence) {
+            return response()->json(['error' => 'You have already checked in today!'], 422);
+        }
+
+        // Get company settings
+        $settings = CompanySetting::getSettings();
+
+        // Validate location if office coordinates are set
+        if ($settings->office_latitude && $settings->office_longitude) {
+            $distance = $this->calculateDistance(
+                $validated['latitude'],
+                $validated['longitude'],
+                $settings->office_latitude,
+                $settings->office_longitude
+            );
+
+            if ($distance > $settings->max_radius_meters) {
+                return response()->json([
+                    'error' => "You are too far from the office! Distance: " . round($distance) . " meters. Maximum allowed: {$settings->max_radius_meters} meters."
+                ], 422);
+            }
+        }
+
+        // Determine status based on check-in time
+        $checkInTime = Carbon::now();
+        $workStartTime = Carbon::parse($settings->work_start_time);
+        $status = $checkInTime->lte($workStartTime) ? 'present' : 'late';
+
+        // Create presence record
+        $presence = Presence::create([
+            'employee_id' => $employee->id,
+            'date' => today(),
+            'check_in' => $checkInTime,
+            'status' => $status,
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Check-in successful!',
+            'presence' => $presence,
+        ]);
+    }
+
+    public function checkOut(Request $request)
+    {
+        $validated = $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $user = auth()->user();
+        $employee = Employee::where('email', $user->email)->first();
+
+        if (!$employee) {
+            return response()->json(['error' => 'Employee record not found!'], 404);
+        }
+
+        // Find today's presence
+        $presence = Presence::where('employee_id', $employee->id)
+            ->whereDate('date', today())
+            ->first();
+
+        if (!$presence) {
+            return response()->json(['error' => 'You have not checked in today!'], 422);
+        }
+
+        if ($presence->check_out) {
+            return response()->json(['error' => 'You have already checked out today!'], 422);
+        }
+
+        // Get company settings
+        $settings = CompanySetting::getSettings();
+
+        // Validate location if office coordinates are set
+        if ($settings->office_latitude && $settings->office_longitude) {
+            $distance = $this->calculateDistance(
+                $validated['latitude'],
+                $validated['longitude'],
+                $settings->office_latitude,
+                $settings->office_longitude
+            );
+
+            if ($distance > $settings->max_radius_meters) {
+                return response()->json([
+                    'error' => "You are too far from the office! Distance: " . round($distance) . " meters. Maximum allowed: {$settings->max_radius_meters} meters."
+                ], 422);
+            }
+        }
+
+        // Update presence with check-out time
+        $presence->update([
+            'check_out' => Carbon::now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Check-out successful!',
+            'presence' => $presence,
+        ]);
+    }
+
+    /**
+     * Calculate distance between two coordinates using Haversine formula
+     * Returns distance in meters
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000; // Earth's radius in meters
+
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lon1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lon2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+             cos($latFrom) * cos($latTo) *
+             sin($lonDelta / 2) * sin($lonDelta / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 }

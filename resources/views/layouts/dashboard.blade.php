@@ -138,6 +138,16 @@
             </li>
             @endif
 
+            {{-- Settings - Admin Only --}}
+            @if(auth()->user()->role === 'admin')
+            <li class="sidebar-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <a href="{{ route('settings.index') }}" class='sidebar-link'>
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            @endif
+
             <li class="sidebar-item">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

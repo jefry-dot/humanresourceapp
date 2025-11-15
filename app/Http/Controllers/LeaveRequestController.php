@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
 use App\Models\Employee;
 
+
 class LeaveRequestController extends Controller
 {
     public function index()

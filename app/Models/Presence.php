@@ -15,6 +15,8 @@ class Presence extends Model
         'check_out',
         'date',
         'status',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [

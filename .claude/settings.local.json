@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(php create_employee_record.php:*)"
     ],
     "deny": [],
     "ask": []

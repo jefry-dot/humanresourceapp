@@ -66,6 +66,7 @@
                             <th>Check In</th>
                             <th>Check Out</th>
                             <th>Status</th>
+                            <th>Location</th>
                             <th>Options</th>
                         </tr>
                     </thead>
@@ -88,6 +89,15 @@
                                 @endif
                             </td>
                             <td>
+                                @if($presence->latitude && $presence->longitude)
+                                    <a href="https://www.google.com/maps?q={{ $presence->latitude }},{{ $presence->longitude }}" target="_blank" class="btn btn-sm btn-info" title="View on Map">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
                                 {{-- Only Admin and HR can Edit/Delete presences --}}
                                 @if(in_array(auth()->user()->role, ['admin', 'hr']))
                                 <div class="btn-group" role="group">
@@ -105,7 +115,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">No presences found</td>
+                            <td colspan="7" class="text-center">No presences found</td>
                         </tr>
                         @endforelse
                     </tbody>

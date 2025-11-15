@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\SettingController;
 
 
 Route::get('/', function () {
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
     Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Settings - Admin only
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 // ============================================
@@ -108,8 +113,10 @@ Route::middleware(['auth', 'role:admin,hr,manager,employee'])->group(function ()
     Route::get('/leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
     Route::post('/leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
 
-    // Presences - Employee can view own
+    // Presences - Employee can view own and check-in/check-out
     Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
+    Route::post('/presences/check-in', [PresenceController::class, 'checkIn'])->name('presences.checkin');
+    Route::post('/presences/check-out', [PresenceController::class, 'checkOut'])->name('presences.checkout');
 });
 
 Route::middleware('auth')->group(function () {
