@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DepartmentController;
 
 
 Route::get('/', function () {
@@ -28,7 +29,8 @@ Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->n
 Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
 Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
-
+Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
+Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
