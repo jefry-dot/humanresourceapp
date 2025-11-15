@@ -61,4 +61,21 @@ class TaskController extends Controller
 
         return redirect()->route('tasks.index')->with('success', 'Task deleted successfully!');
     }
+
+    public function updateStatus(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,in_progress,completed',
+        ]);
+
+        $task->update(['status' => $validated['status']]);
+
+        $statusMessages = [
+            'pending' => 'Task marked as Pending!',
+            'in_progress' => 'Task marked as In Progress!',
+            'completed' => 'Task marked as Completed!',
+        ];
+
+        return redirect()->route('tasks.index')->with('success', $statusMessages[$validated['status']]);
+    }
 }

@@ -86,17 +86,17 @@
                                         <i class="bi bi-eye"></i>
                                     </button>
                                     @if($task->status != 'completed')
-                                    <button type="button" class="btn btn-sm btn-success" title="Mark as Done">
+                                    <button type="button" class="btn btn-sm btn-success" title="Mark as Done" onclick="updateTaskStatus({{ $task->id }}, 'completed')">
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                     @endif
                                     @if($task->status != 'in_progress')
-                                    <button type="button" class="btn btn-sm btn-warning" title="Mark as In Progress">
+                                    <button type="button" class="btn btn-sm btn-warning" title="Mark as In Progress" onclick="updateTaskStatus({{ $task->id }}, 'in_progress')">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
                                     @endif
                                     @if($task->status != 'pending')
-                                    <button type="button" class="btn btn-sm btn-secondary" title="Mark as Pending">
+                                    <button type="button" class="btn btn-sm btn-secondary" title="Mark as Pending" onclick="updateTaskStatus({{ $task->id }}, 'pending')">
                                         <i class="bi bi-clock"></i>
                                     </button>
                                     @endif
@@ -245,6 +245,13 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden form for status updates -->
+<form id="statusUpdateForm" method="POST" style="display: none;">
+    @csrf
+    @method('PATCH')
+    <input type="hidden" name="status" id="status_value">
+</form>
 @endsection
 
 @push('scripts')
@@ -307,6 +314,16 @@
         // Show modal
         var deleteTaskModal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
         deleteTaskModal.show();
+    }
+
+    // Function to update task status
+    function updateTaskStatus(taskId, status) {
+        // Set form action and status value
+        document.getElementById('statusUpdateForm').action = `/tasks/${taskId}/status`;
+        document.getElementById('status_value').value = status;
+
+        // Submit the form
+        document.getElementById('statusUpdateForm').submit();
     }
 </script>
 @endpush
