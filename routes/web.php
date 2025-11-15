@@ -7,6 +7,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PresenceController;
 
 
 Route::get('/', function () {
@@ -41,6 +42,12 @@ Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
 Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
 Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
 Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+
+Route::get('/presences', [PresenceController::class, 'index'])->name('presences.index');
+Route::post('/presences', [PresenceController::class, 'store'])->name('presences.store');
+Route::get('/presences/{presence}/edit', [PresenceController::class, 'edit'])->name('presences.edit');
+Route::put('/presences/{presence}', [PresenceController::class, 'update'])->name('presences.update');
+Route::delete('/presences/{presence}', [PresenceController::class, 'destroy'])->name('presences.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

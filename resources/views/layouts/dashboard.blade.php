@@ -96,7 +96,7 @@
             </li>
 
             <li class="sidebar-item">
-                <a href="#" class='sidebar-link'>
+                <a href="{{ route('presences.index') }}" class='sidebar-link'>
                     <i class="bi bi-calendar-check-fill"></i>
                     <span>Presences</span>
                 </a>
